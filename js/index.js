@@ -38,16 +38,24 @@ class BaseCharacter {
   heal(healHp) {
     this.hp += healHp;
     var _this = this;
-    _this.element.getElementsByClassName("effect-image")[0].style.display = "block";
-    _this.element.getElementsByClassName("hurt-text")[0].classList.add("attacked");
-    _this.element.getElementsByClassName("hurt-text")[0].textContent = healHp;
-    _this.element.getElementsByClassName("hurt-text")[0].style.color = "green";
-    _this.id = setTimeout(function() {
-      _this.element.getElementsByClassName("effect-image")[0].style.display = "none";
-      _this.element.getElementsByClassName("hurt-text")[0].classList.remove("attacked");
-      _this.element.getElementsByClassName("hurt-text")[0].textContent = "";
-      _this.element.getElementsByClassName("hurt-text")[0].style.color = "red";
-    }, 500);
+    var i = 1;
+    _this.id = setInterval(function() {
+      if (i == 1) {
+        _this.element.getElementsByClassName("effect-image")[0].style.display = "block";
+        _this.element.getElementsByClassName("hurt-text")[0].classList.add("attacked");
+        _this.element.getElementsByClassName("hurt-text")[0].textContent = healHp;
+        _this.element.getElementsByClassName("hurt-text")[0].style.color = "green";
+        }      
+        _this.element.getElementsByClassName("effect-image")[0].src = 'images/effect/heal/'+ i +'.png';
+        i++;
+      if (i > 8) {
+        _this.element.getElementsByClassName("effect-image")[0].style.display = "none";
+        _this.element.getElementsByClassName("hurt-text")[0].classList.remove("attacked");
+        _this.element.getElementsByClassName("hurt-text")[0].textContent = "";
+        _this.element.getElementsByClassName("hurt-text")[0].style.color = "red";
+        clearInterval(_this.id);
+      }
+    }, 50); 
   }
   die() {
     this.alive = false;
