@@ -20,21 +20,34 @@ class BaseCharacter {
     var _this = this;
     var i = 1;
     _this.id = setInterval(function() {
-    if (i == 1) {
-        _this.element.getElementsByClassName("effect-image")[0].style.display = "block";
-        _this.element.getElementsByClassName("hurt-text")[0].classList.add("attacked");
-        _this.element.getElementsByClassName("hurt-text")[0].textContent = damage;
-      }      
-      _this.element.getElementsByClassName("effect-image")[0].src = 'images/effect/blade/'+ i +'.png';
-      i++;
-    if (i > 8) {
+      if (i == 1) {
+          _this.element.getElementsByClassName("effect-image")[0].style.display = "block";
+          _this.element.getElementsByClassName("hurt-text")[0].classList.add("attacked");
+          _this.element.getElementsByClassName("hurt-text")[0].textContent = damage;
+        }      
+        _this.element.getElementsByClassName("effect-image")[0].src = 'images/effect/blade/'+ i +'.png';
+        i++;
+      if (i > 8) {
+        _this.element.getElementsByClassName("effect-image")[0].style.display = "none";
+        _this.element.getElementsByClassName("hurt-text")[0].classList.remove("attacked");
+        _this.element.getElementsByClassName("hurt-text")[0].textContent = "";
+        clearInterval(_this.id);
+      }
+    }, 50);
+  }
+  heal(healHp) {
+    this.hp += healHp;
+    var _this = this;
+    _this.element.getElementsByClassName("effect-image")[0].style.display = "block";
+    _this.element.getElementsByClassName("hurt-text")[0].classList.add("attacked");
+    _this.element.getElementsByClassName("hurt-text")[0].textContent = healHp;
+    _this.element.getElementsByClassName("hurt-text")[0].style.color = "green";
+    _this.id = setTimeout(function() {
       _this.element.getElementsByClassName("effect-image")[0].style.display = "none";
       _this.element.getElementsByClassName("hurt-text")[0].classList.remove("attacked");
       _this.element.getElementsByClassName("hurt-text")[0].textContent = "";
-      clearInterval(_this.id);
-    }
-
-  }, 50);
+      _this.element.getElementsByClassName("hurt-text")[0].style.color = "red";
+    }, 500);
   }
   die() {
     this.alive = false;
@@ -62,8 +75,8 @@ class Hero extends BaseCharacter {
     var damage = Math.random() * (this.ap / 2) + (this.ap / 2);
     super.attack(character, Math.floor(damage));
   }
-  heal() {
-    this.hp += 30;
+  heal(healHp) {
+    super.heal(healHp);
     this.updateHtml(this.hpElement, this.hurtElement);
   }
   getHurt(damage) {
@@ -95,7 +108,7 @@ class Monster extends BaseCharacter {
   }
 }
 var hero = new Hero("Bernard", 130, 30);
-var monster = new Monster("Skeleton", 130, 10);
+var monster = new Monster("Skeleton", 130, 40);
 
 var rounds = 10;
 function endTurn() {
@@ -107,7 +120,6 @@ function endTurn() {
 }
 function heroAttack() {
   document.getElementsByClassName("skill-block")[0].style.display = "none";
-
   setTimeout(function() {
     hero.element.classList.add("attacking");
     console.log("開打");
@@ -118,21 +130,16 @@ function heroAttack() {
   }, 100);
   setTimeout(function() {
     if (monster.alive) {
-      monster.element.classList.add("attacking");
-      setTimeout(function() {
-        monster.attack(hero);
-        monster.element.classList.remove("attacking");
+      monsterAttack();
+      setTimeout(function(){
         endTurn();
-        if (hero.alive == false) {
-          finish();
-        } else {
-          document.getElementsByClassName("skill-block")[0].style.display = "block";
-        }
-      }, 500);
+        document.getElementsByClassName("skill-block")[0].style.display = "block";
+      }, 1000);
     } else {
       finish();
     }
   }, 1100);
+
 }
 function finish() {
   var dialog = document.getElementById("dialog")
@@ -144,24 +151,26 @@ function finish() {
   }
 }
 function heroHeal() {
-  hero.heal();
+  document.getElementsByClassName("skill-block")[0].style.display = "none";
+  var healHp = Math.min(30, hero.maxHp-hero.hp);
+  hero.heal(healHp);
+  setTimeout(function(){
+    monsterAttack();
+    setTimeout(function(){
+      endTurn();
+      document.getElementsByClassName("skill-block")[0].style.display = "block";
+    }, 1000);
+  }, 500);
+}
+function monsterAttack(){
+  monster.element.classList.add("attacking");
   setTimeout(function() {
-    if (monster.alive) {
-      monster.element.classList.add("attacking");
-      setTimeout(function() {
-        monster.attack(hero);
-        monster.element.classList.remove("attacking");
-        endTurn();
-        if (hero.alive == false) {
-          finish();
-        } else {
-          document.getElementsByClassName("skill-block")[0].style.display = "block";
-        }
-      }, 500);
-    } else {
+    monster.attack(hero);
+    monster.element.classList.remove("attacking");
+    if (hero.alive == false) {
       finish();
-    }
-  }, 200);
+    } 
+  }, 500);
 }
 function addSkillEvent() {
   var skill = document.getElementById("skill");
