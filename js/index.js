@@ -62,6 +62,10 @@ class Hero extends BaseCharacter {
     var damage = Math.random() * (this.ap / 2) + (this.ap / 2);
     super.attack(character, Math.floor(damage));
   }
+  heal() {
+    this.hp += 30;
+    this.updateHtml(this.hpElement, this.hurtElement);
+  }
   getHurt(damage) {
     super.getHurt(damage);
     this.updateHtml(this.hpElement, this.hurtElement);
@@ -139,10 +143,34 @@ function finish() {
     dialog.classList.add("lose");
   }
 }
+function heroHeal() {
+  hero.heal();
+  setTimeout(function() {
+    if (monster.alive) {
+      monster.element.classList.add("attacking");
+      setTimeout(function() {
+        monster.attack(hero);
+        monster.element.classList.remove("attacking");
+        endTurn();
+        if (hero.alive == false) {
+          finish();
+        } else {
+          document.getElementsByClassName("skill-block")[0].style.display = "block";
+        }
+      }, 500);
+    } else {
+      finish();
+    }
+  }, 200);
+}
 function addSkillEvent() {
   var skill = document.getElementById("skill");
   skill.onclick = function() { 
     heroAttack(); 
+  }
+  var heal = document.getElementById("heal");
+  heal.onclick = function() { 
+    heroHeal(); 
   }
 }
 addSkillEvent();
