@@ -189,5 +189,16 @@ function addSkillEvent() {
   heal.onclick = function() { 
     heroHeal(); 
   }
+  document.onkeydown = function(event) { 
+    if (document.getElementsByClassName("skill-block")[0].style.display != "none"){
+      var key = String.fromCharCode(event.keyCode);
+      if (key == "A") {
+        heroAttack(); 
+      }
+      if (key == "D") {
+        heroHeal(); 
+      }
+    } 
+  }
 }
 addSkillEvent();

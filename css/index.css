@@ -142,6 +142,7 @@
 
 #hero-image-block .skill-block {
   position: relative;
+  display: block;
 }
 
 #hero-image-block .skill-image {
